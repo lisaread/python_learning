@@ -16,9 +16,16 @@ def lambda_handler(event,context):
         appName = event['ResourceProperties']['ApplicationName']
         deploymenttriggerName = event['ResourceProperties']['DeploymentTriggerName']
         deploymenttargetArn = event['ResourceProperties']['TargetArn']
+        eventsArray = event['ResourceProperties']['EventsArray']
         alarmsArn = event['ResourceProperties']['Alarms']
         ignoreContinuePoll = event['ResourceProperties']['IgnoreContinue']
-        eventsArray = event['ResourceProperties']['EventsArray']
+        if ignoreContinuePoll == 'True':
+                              ignoreCont = True
+        elif ignoreContinuePoll == 'False':
+                              ignoreCont = False
+        else:
+             raise ValueError # Tell me something went wrong
+
         updateResponse = codeDeploy.update_deployment_group(
             applicationName = appName,
             currentDeploymentGroupName = deploymentGroup,
@@ -30,8 +37,8 @@ def lambda_handler(event,context):
                 },
             ],
             alarmConfiguration = {
-                'enabled': True,
-                'ignorePollAlarmFailure': ignoreContinuePoll,
+                'enabled': 'True',
+                'ignorePollAlarmFailure': ignoreCont,
                 'alarms': [
                      {
                          'name': alarmsArn
